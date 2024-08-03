@@ -1,0 +1,33 @@
+[package]
+name = "vello-vs-pixels"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# [dependencies]
+# anyhow = "1.0.86"
+# pixels = "0.13.0"
+# pollster = "0.3.0"
+# vello = "0.2.1"
+
+[dependencies]
+env_logger = "0.10"
+error-iter = "0.4"
+glam = "0.28.0"
+log = "0.4"
+palette = "0.7.6"
+pixels = "0.13.0"
+tao = { version = "0.28.1", features = ["rwh_05"] }
+# Pixels winit
+# winit = "0.28"
+# Vello
+# winit = "0.30.4"
+winit_input_helper = "0.14"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "draw"
+harness = false
