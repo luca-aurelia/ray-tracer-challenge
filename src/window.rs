@@ -1,7 +1,6 @@
+use crate::pixels::{Pixels, SurfaceTexture};
 use error_iter::ErrorIter as _;
 use log::error;
-use pixels::Pixels;
-use pixels::SurfaceTexture;
 use tao::dpi::LogicalSize;
 use tao::event::{Event, KeyEvent, WindowEvent};
 use tao::event_loop::{ControlFlow, EventLoop};
@@ -9,15 +8,19 @@ use tao::keyboard::KeyCode;
 use tao::window::WindowBuilder;
 
 use crate::canvas::Canvas;
-use crate::{Sketch, HEIGHT, WIDTH};
+use crate::Sketch;
 
-pub struct Window {}
+pub struct Window {
+    event_loop: EventLoop<()>,
+    pub canvas: Canvas,
+    tao_window: tao::window::Window,
+}
 
 impl Window {
-    pub fn new(sketch: Sketch) -> Self {
+    pub fn new(width: u32, height: u32) -> Self {
         let event_loop = EventLoop::new();
-        let window = {
-            let size = LogicalSize::new(WIDTH, HEIGHT);
+        let tao_window = {
+            let size = LogicalSize::new(width, height);
             WindowBuilder::new()
                 .with_title("Playground")
                 .with_inner_size(size)
@@ -28,22 +31,35 @@ impl Window {
                 .unwrap()
         };
 
-        let mut canvas = {
-            let window_size = window.inner_size();
+        let canvas = {
+            let window_size = tao_window.inner_size();
             let surface_texture =
-                SurfaceTexture::new(window_size.width, window_size.height, &window);
-            let maybe_pixels = Pixels::new(WIDTH, HEIGHT, surface_texture);
-            let pixels = match maybe_pixels {
-                Ok(pixels) => pixels,
-                Err(err) => {
-                    log_error("Pixels::new", err);
-                    panic!("Error creating Pixels");
+                SurfaceTexture::new(window_size.width, window_size.height, &tao_window);
+            #[cfg(not(test))]
+            let pixels = {
+                let maybe_pixels = Pixels::new(width, height, surface_texture);
+                match maybe_pixels {
+                    Ok(pixels) => pixels,
+                    Err(err) => {
+                        log_error("Pixels::new", err);
+                        panic!("Error creating Pixels");
+                    }
                 }
             };
-            Canvas::new(pixels)
+            #[cfg(test)]
+            let pixels = Pixels::new(width, height);
+            Canvas::new(width, height, pixels)
         };
 
-        event_loop.run(move |event, _, control_flow| {
+        Window {
+            event_loop,
+            tao_window,
+            canvas,
+        }
+    }
+
+    pub fn run_event_loop(mut self, sketch: Sketch) {
+        self.event_loop.run(move |event, _, control_flow| {
             match event {
                 Event::WindowEvent { event, .. } => match event {
                     // Close events
@@ -61,7 +77,8 @@ impl Window {
 
                     // Resize the window
                     WindowEvent::Resized(size) => {
-                        if let Err(err) = canvas.pixels.resize_surface(size.width, size.height) {
+                        if let Err(err) = self.canvas.pixels.resize_surface(size.width, size.height)
+                        {
                             log_error("pixels.resize_surface", err);
                             *control_flow = ControlFlow::Exit;
                         }
@@ -78,8 +95,8 @@ impl Window {
 
                 // Draw the current frame
                 Event::RedrawRequested(_) => {
-                    sketch.draw(&mut canvas);
-                    if let Err(err) = canvas.pixels.render() {
+                    sketch.draw(&mut self.canvas);
+                    if let Err(err) = self.canvas.pixels.render() {
                         log_error("pixels.render", err);
                         *control_flow = ControlFlow::Exit;
                     }
