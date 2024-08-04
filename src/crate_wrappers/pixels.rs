@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 pub use pixels::*;
 
 #[cfg(test)]

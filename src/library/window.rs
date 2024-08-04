@@ -1,5 +1,6 @@
-use crate::pixels::{Pixels, SurfaceTexture};
-use error_iter::ErrorIter as _;
+use crate::crate_wrappers::pixels::Pixels;
+use crate::library::canvas::Canvas;
+use crate::Sketch;
 use log::error;
 use tao::dpi::LogicalSize;
 use tao::event::{Event, KeyEvent, WindowEvent};
@@ -7,12 +8,13 @@ use tao::event_loop::{ControlFlow, EventLoop};
 use tao::keyboard::KeyCode;
 use tao::window::WindowBuilder;
 
-use crate::canvas::Canvas;
-use crate::Sketch;
-
 pub struct Window {
     event_loop: EventLoop<()>,
     pub canvas: Canvas,
+
+    // We need to hold on to this because if we drop it,
+    // Tao doesn't actually render the window.
+    #[allow(dead_code)]
     tao_window: tao::window::Window,
 }
 
@@ -32,11 +34,13 @@ impl Window {
         };
 
         let canvas = {
-            let window_size = tao_window.inner_size();
-            let surface_texture =
-                SurfaceTexture::new(window_size.width, window_size.height, &tao_window);
             #[cfg(not(test))]
             let pixels = {
+                use crate::crate_wrappers::pixels::SurfaceTexture;
+
+                let window_size = tao_window.inner_size();
+                let surface_texture =
+                    SurfaceTexture::new(window_size.width, window_size.height, &tao_window);
                 let maybe_pixels = Pixels::new(width, height, surface_texture);
                 match maybe_pixels {
                     Ok(pixels) => pixels,
@@ -46,8 +50,10 @@ impl Window {
                     }
                 }
             };
+
             #[cfg(test)]
             let pixels = Pixels::new(width, height);
+
             Canvas::new(width, height, pixels)
         };
 
@@ -109,6 +115,8 @@ impl Window {
 }
 
 fn log_error<E: std::error::Error + 'static>(method_name: &str, err: E) {
+    use error_iter::ErrorIter as _;
+
     error!("{method_name}() failed: {err}");
     for source in err.sources().skip(1) {
         error!("  Caused by: {source}");

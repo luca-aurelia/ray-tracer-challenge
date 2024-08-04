@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::extensions::F32Extension;
 
 pub trait GlamVec3Extension {

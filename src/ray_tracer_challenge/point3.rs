@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::extensions::F32Extension;
 use std::ops::Sub;
 
@@ -56,6 +58,7 @@ pub fn pt3(x: f32, y: f32, z: f32) -> Point3 {
     Point3::new(x, y, z)
 }
 
+#[cfg(test)]
 mod tests {
     #[test]
     fn points_have_a_w_value_of_1() {

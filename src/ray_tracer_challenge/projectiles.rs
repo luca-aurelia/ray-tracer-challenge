@@ -1,5 +1,6 @@
 use super::{pt2, vec2, Point2, Vec2};
-use crate::{canvas::Canvas, oklcha};
+use crate::library::canvas::Canvas;
+use crate::library::color::oklcha;
 
 struct Projectile {
     position: Point2,

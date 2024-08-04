@@ -32,6 +32,7 @@ impl Sub<Vec2> for Point2 {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::super::{pt2, vec2};
     use super::*;

@@ -103,6 +103,7 @@ impl Into<palette::Srgba<f32>> for Rgb {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::extensions::F32Extension;

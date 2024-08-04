@@ -20,6 +20,7 @@ pub fn size2(width: f32, height: f32) -> Size2 {
     Size2::new(width, height)
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 

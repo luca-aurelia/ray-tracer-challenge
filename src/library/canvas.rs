@@ -3,7 +3,7 @@ use image::ImageResult;
 use palette::{FromColor, Oklcha, Srgba};
 use std::time::{Duration, Instant};
 
-use crate::pixels::{Pixels, NUM_COMPONENTS_IN_COLOR};
+use crate::crate_wrappers::pixels::{Pixels, NUM_COMPONENTS_IN_COLOR};
 use crate::ray_tracer_challenge::{pt2, size2, Point2, Rgb, Size2};
 
 /// `pixels` stores colors internally as four instances of `u8`.
@@ -160,6 +160,7 @@ pub struct Pixel {
     rgb: Rgb,
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::ray_tracer_challenge::pt2;
@@ -204,11 +205,11 @@ mod tests {
         let xy = pt2(2.0, 3.0);
         canvas.set_pixel_rgb(xy, red);
 
-        let path = Utf8Path::new("src/test/save_image_actual_output.webp");
+        let path = Utf8Path::new("src/tests/save_image_actual_output.webp");
         canvas.save_image(path).expect("Failed to save image.");
 
         let actual_bytes = std::fs::read(path).expect("Failed to read file.");
-        let expected_bytes = include_bytes!("test/save_image_expected_output.webp");
+        let expected_bytes = include_bytes!("../tests/save_image_expected_output.webp");
         assert_eq!(actual_bytes, expected_bytes);
         // std::fs::remove_file(path).expect("Failed to remove file.");
     }

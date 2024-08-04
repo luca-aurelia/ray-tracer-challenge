@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use glam::Vec4Swizzles;
 
 use crate::extensions::F32Extension;
@@ -118,6 +120,7 @@ pub fn vec3(x: f32, y: f32, z: f32) -> Vec3 {
     Vec3::new(x, y, z)
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 

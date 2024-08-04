@@ -24,6 +24,7 @@ impl F32Extension for f32 {
     }
 }
 
+#[cfg(test)]
 mod tests {
     #[test]
     fn f32_almost_eq() {

@@ -52,6 +52,7 @@ pub fn pt2(x: f32, y: f32) -> Point2 {
     Point2::new(x, y)
 }
 
+#[cfg(test)]
 mod tests {
     #[test]
     fn points_have_a_w_value_of_1() {
